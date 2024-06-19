@@ -1,9 +1,10 @@
-import { ConsoleLogger, LogLevel } from '@nestjs/common';
+import { ConsoleLogger, ConsoleLoggerOptions, LogLevel } from '@nestjs/common';
 import { isPlainObject } from '@nestjs/common/utils/shared.utils';
 
-interface LoggerOptions {
+interface LoggerOptions extends ConsoleLoggerOptions {
   devMode?: boolean;
   getTraceId?: () => string;
+  context?: string;
 }
 
 /**
@@ -15,9 +16,10 @@ export class Logger extends ConsoleLogger {
   public getTraceId = () => '';
 
   constructor(options: LoggerOptions = {}) {
-    super();
+    super(options.context, options);
     this.getTraceId = options.getTraceId || this.getTraceId;
     this.devMode = options.devMode || this.isDevEnv();
+    this.setLogLevelByEnv(options.logLevels);
   }
 
   protected formatMessage(
@@ -68,6 +70,15 @@ export class Logger extends ConsoleLogger {
     }
 
     return super.colorize(message, logLevel);
+  }
+
+  /**
+   * For not dev environment disable debug logs
+   */
+  private setLogLevelByEnv(optionsLogLevels: LogLevel[]) {
+    if (optionsLogLevels) return optionsLogLevels;
+
+    this.setLogLevels(this.devMode ? ['verbose'] : ['log']);
   }
 
   private isDevEnv() {
