@@ -1,0 +1,58 @@
+# Require NPM_TOKEN in GitHub
+# <REPO_URL>/settings/secrets/actions
+
+name: Npm package
+
+on:
+  push:
+    branches:
+      - '*'
+    tags:
+      - v*
+
+jobs:
+  build-test-matrix:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: [10, 12, 14, 16, 18]
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Set up Nodejs  ${{ matrix.version }}
+        uses: actions/setup-node@master
+        with:
+          node-version: ${{ matrix.version }}
+      - name: Build
+        run: npm ci
+
+      - name: Test
+        run: npm test
+
+      - uses: IgnusG/jest-report-action@v2.3.3
+        if: always()
+        with:
+          access-token: ${{ secrets.GITHUB_TOKEN }}
+          check-name: Jest test with node-version ${{ matrix.version }}
+
+
+  deploy:
+    if: contains(github.ref, 'refs/tags/v')
+    needs: build-test-matrix
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Set up Nodejs 10.16.3
+        uses: actions/setup-node@master
+        with:
+          version: 10.16.3
+
+      - name: Publish to Npm
+        run: |
+          echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' >> .npmrc
+          npm publish
+        env:
+          NPM_TOKEN: ${{secrets.NPM_TOKEN}}
