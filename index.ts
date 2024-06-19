@@ -14,7 +14,7 @@ export class Logger extends ConsoleLogger {
   public devMode = false;
   public getTraceId = () => '';
 
-  constructor(options?: LoggerOptions) {
+  constructor(options: LoggerOptions = {}) {
     super();
     this.getTraceId = options.getTraceId || this.getTraceId;
     this.devMode = options.devMode || this.isDevEnv();
