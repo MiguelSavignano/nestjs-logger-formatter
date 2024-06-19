@@ -1,13 +1,18 @@
-## package-example
+# nestjs-logger-formatter
 
 ## Usage
+
 ```
-npm install package-example
+npm install nestjs-logger-formatter
 ```
 
 ```ts
-import { myFunction } from 'package-example';
+import { Logger } from 'nestjs-logger-formatter';
 
-myFunction()
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule, {
+    logger: new Logger(),
+  });
+  await app.listen(3000);
+}
 ```
-
