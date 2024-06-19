@@ -27,14 +27,14 @@ jobs:
       - name: Build
         run: npm ci
 
-      # - name: Test
-      #   run: npm test
+      - name: Test
+        run: npm test
 
-      # - uses: IgnusG/jest-report-action@v2.3.3
-      #   if: always()
-      #   with:
-      #     access-token: ${{ secrets.GITHUB_TOKEN }}
-      #     check-name: Jest test with node-version ${{ matrix.version }}
+      - uses: IgnusG/jest-report-action@v2.3.3
+        if: always()
+        with:
+          access-token: ${{ secrets.GITHUB_TOKEN }}
+          check-name: Jest test with node-version ${{ matrix.version }}
 
   deploy:
     if: contains(github.ref, 'refs/tags/v')
